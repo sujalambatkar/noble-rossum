@@ -19,7 +19,7 @@ export function PodiumCard({ players }: PodiumCardProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-end max-w-5xl mx-auto">
-      {/* 2nd Place — left */}
+      {/* 2nd Place — mobile: middle | desktop: left */}
       {second ? (
         <PodiumTile
           place={2}
@@ -29,13 +29,13 @@ export function PodiumCard({ players }: PodiumCardProps) {
           ring="ring-slate-300/40"
           borderGlow="rgba(203, 213, 225, 0.35)"
           delay="120ms"
-          order="md:order-1"
+          order="order-2 md:order-1"
         />
       ) : (
-        <div className="md:order-1" />
+        <div className="order-2 md:order-1" />
       )}
 
-      {/* 1st Place — center, taller */}
+      {/* 1st Place — mobile: top | desktop: center, taller */}
       <PodiumTile
         place={1}
         player={first}
@@ -44,11 +44,11 @@ export function PodiumCard({ players }: PodiumCardProps) {
         ring="ring-yellow-400/50"
         borderGlow="rgba(250, 204, 21, 0.5)"
         delay="0ms"
-        order="md:order-2"
+        order="order-1 md:order-2"
         champion
       />
 
-      {/* 3rd Place — right */}
+      {/* 3rd Place — mobile: bottom | desktop: right */}
       {third ? (
         <PodiumTile
           place={3}
@@ -58,10 +58,10 @@ export function PodiumCard({ players }: PodiumCardProps) {
           ring="ring-orange-400/40"
           borderGlow="rgba(251, 146, 60, 0.35)"
           delay="220ms"
-          order="md:order-3"
+          order="order-3 md:order-3"
         />
       ) : (
-        <div className="md:order-3" />
+        <div className="order-3 md:order-3" />
       )}
     </div>
   );
