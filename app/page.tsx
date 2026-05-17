@@ -44,11 +44,11 @@ export default async function Home() {
             </div>
           </Link>
 
-          <nav className="flex items-center gap-3">
-            <Link href="/analytics" className="btn-ghost text-sm hidden sm:inline-flex">
+          <nav className="flex items-center gap-2 sm:gap-3">
+            <Link href="/analytics" className="btn-ghost text-xs sm:text-sm">
               Analytics
             </Link>
-            <Link href="/admin" className="btn-ghost text-sm">
+            <Link href="/admin" className="btn-ghost text-xs sm:text-sm">
               Admin
             </Link>
           </nav>
