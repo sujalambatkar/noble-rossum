@@ -1,65 +1,231 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Leaderboard } from "@/components/Leaderboard";
+import { PodiumCard } from "@/components/PodiumCard";
 
-export default function Home() {
+interface LeaderboardPlayer {
+  id: string;
+  name: string;
+  totalPoints: number;
+  wins: number;
+  roundsParticipated: number;
+  avgPointsPerRound: number;
+}
+
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+async function getStandings(): Promise<LeaderboardPlayer[]> {
+  try {
+    const response = await fetch(`${getBaseUrl()}/api/standings`, {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Failed to fetch standings");
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching standings:", error);
+    return [];
+  }
+}
+
+async function getRoundCount(): Promise<number> {
+  try {
+    const response = await fetch(`${getBaseUrl()}/api/rounds`, {
+      cache: "no-store",
+    });
+    if (!response.ok) return 0;
+    const data = await response.json();
+    return data.rounds?.length ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+export default async function Home() {
+  const [standings, roundCount] = await Promise.all([getStandings(), getRoundCount()]);
+  const leader = standings[0];
+  const totalPointsAwarded = standings.reduce((sum, p) => sum + p.totalPoints, 0);
+  const totalWins = standings.reduce((sum, p) => sum + p.wins, 0);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="aurora-bg min-h-screen relative">
+      <div className="grid-overlay" />
+
+      {/* ============== HEADER ============== */}
+      <header className="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl bg-black/40">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center font-black text-amber-950 text-lg shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                NR
+              </div>
+              <div className="absolute -inset-2 bg-yellow-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-shimmer leading-none">
+                NOBLE ROSSUM
+              </h1>
+              <p className="text-[10px] text-white/40 tracking-[0.3em] mt-1 font-mono">
+                CRICKET CHAMPIONSHIP · SEASON 1
+              </p>
+            </div>
+          </Link>
+
+          <nav className="flex items-center gap-3">
+            <Link href="/analytics" className="btn-ghost text-sm hidden sm:inline-flex">
+              Analytics
+            </Link>
+            <Link href="/admin" className="btn-ghost text-sm">
+              Admin
+            </Link>
+          </nav>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* ============== HERO ============== */}
+      <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-12">
+        <div className="text-center animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8">
+            <span className="live-dot" />
+            <span className="text-[10px] font-bold tracking-[0.3em] text-white/70">
+              LIVE · ROUND {roundCount} COMPLETE
+            </span>
+          </div>
+
+          <h2 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
+            <span className="block text-white/90">The Championship</span>
+            <span className="block text-shimmer">Standings</span>
+          </h2>
+
+          {leader && (
+            <p className="text-lg text-white/60 max-w-2xl mx-auto">
+              <span className="font-bold text-gold-gradient">{leader.name}</span> is
+              leading the pack with{" "}
+              <span className="stat-number font-black text-amber-300">
+                {leader.totalPoints.toLocaleString()}
+              </span>{" "}
+              points across {roundCount} rounds.
+            </p>
+          )}
         </div>
-      </main>
+
+        {/* Stats strip */}
+        {standings.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14 max-w-4xl mx-auto">
+            <StatChip label="PLAYERS" value={standings.length} accent="text-blue-300" delay="0ms" />
+            <StatChip label="ROUNDS" value={roundCount} accent="text-emerald-300" delay="60ms" />
+            <StatChip label="POINTS AWARDED" value={totalPointsAwarded.toLocaleString()} accent="text-amber-300" delay="120ms" />
+            <StatChip label="MATCH WINS" value={totalWins} accent="text-purple-300" delay="180ms" />
+          </div>
+        )}
+      </section>
+
+      {/* ============== TOP THREE ============== */}
+      {standings.length > 0 && (
+        <section className="relative max-w-7xl mx-auto px-6 py-16">
+          <div className="text-center mb-12 animate-fade-in">
+            <div className="text-[10px] font-bold tracking-[0.4em] text-amber-400/80 mb-3">
+              · TOP THREE ·
+            </div>
+            <h3 className="text-3xl md:text-4xl font-black text-white">
+              Champions of the Season
+            </h3>
+          </div>
+          <PodiumCard players={standings} />
+        </section>
+      )}
+
+      {/* ============== LEADERBOARD ============== */}
+      <section className="relative max-w-7xl mx-auto px-6 pb-24">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <div className="text-[10px] font-bold tracking-[0.4em] text-white/40 mb-2">
+              · FULL STANDINGS ·
+            </div>
+            <h3 className="text-3xl md:text-4xl font-black text-white">
+              Player Standings
+            </h3>
+          </div>
+          <div className="hidden md:block text-right">
+            <div className="text-[10px] font-bold tracking-[0.3em] text-white/40">
+              PLAYERS
+            </div>
+            <div className="stat-number text-3xl font-black text-white">
+              {standings.length}
+            </div>
+          </div>
+        </div>
+
+        <div className="glass rounded-3xl overflow-hidden scan-line-container">
+          {standings.length > 0 ? (
+            <Leaderboard players={standings} />
+          ) : (
+            <EmptyState />
+          )}
+        </div>
+      </section>
+
+      {/* ============== FOOTER ============== */}
+      <footer className="relative border-t border-white/5 py-10 mt-20">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-white/40 text-sm">
+            <span className="font-mono tracking-widest text-[10px]">
+              POINTS TRACKER · NEXT.JS · SUPABASE
+            </span>
+          </div>
+          <div className="text-white/30 text-[10px] tracking-widest">
+            © {new Date().getFullYear()} · NOBLE ROSSUM CHAMPIONSHIP
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function StatChip({
+  label,
+  value,
+  accent,
+  delay,
+}: {
+  label: string;
+  value: string | number;
+  accent: string;
+  delay: string;
+}) {
+  return (
+    <div
+      className="glass card-lift rounded-2xl p-5 text-center animate-slide-up"
+      style={{ animationDelay: delay }}
+    >
+      <div className={`stat-number text-3xl md:text-4xl font-black ${accent}`}>
+        {value}
+      </div>
+      <div className="text-[10px] font-bold tracking-[0.25em] text-white/40 mt-1">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="p-20 text-center">
+      <div className="text-[10px] font-bold tracking-[0.4em] text-amber-400/70 mb-4">
+        · NO DATA ·
+      </div>
+      <h4 className="text-2xl font-black text-white mb-3">
+        No matches yet
+      </h4>
+      <p className="text-white/50 max-w-md mx-auto mb-8">
+        No rounds have been recorded. Head to the admin panel to start the
+        championship.
+      </p>
+      <Link href="/admin" className="btn-gold inline-flex">
+        Open Admin Panel →
+      </Link>
     </div>
   );
 }
