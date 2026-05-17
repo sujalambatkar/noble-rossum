@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PointsGapChart } from "@/components/PointsGapChart";
 import { WinProbabilityChart } from "@/components/WinProbabilityChart";
 import { PerformanceTrendChart } from "@/components/PerformanceTrendChart";
-import { calculateAnalytics, AnalyticsData } from "@/lib/analytics";
+import { calculateAnalytics, AnalyticsData, TOTAL_SEASON_ROUNDS } from "@/lib/analytics";
 import type { LeaderboardPlayer } from "@/components/Leaderboard";
 
 export default function Analytics() {
@@ -30,7 +30,9 @@ export default function Analytics() {
         setStandings(standingsData);
         setRounds(roundsData.rounds || []);
         setResults(roundsData.results || []);
-        setAnalytics(calculateAnalytics(standingsData, 60));
+        setAnalytics(
+          calculateAnalytics(standingsData, roundsData.rounds?.length ?? 0)
+        );
       } catch (err) {
         console.error("Error fetching analytics:", err);
       } finally {
@@ -105,9 +107,9 @@ export default function Analytics() {
                 accent="rose"
               />
               <HeroStat
-                label="TOTAL ROUNDS"
-                value={rounds.length.toString()}
-                sub="COMPLETED"
+                label="ROUNDS"
+                value={`${rounds.length} / ${TOTAL_SEASON_ROUNDS}`}
+                sub={`${Math.max(0, TOTAL_SEASON_ROUNDS - rounds.length)} TO GO`}
                 accent="emerald"
               />
               <HeroStat
@@ -179,7 +181,14 @@ export default function Analytics() {
                         style={{ animationDelay: `${idx * 40}ms` }}
                       >
                         <td className="px-3 sm:px-6 py-4">
-                          <div className="font-bold text-white text-sm sm:text-base truncate">{player.name}</div>
+                          <div className={`font-bold text-sm sm:text-base truncate ${player.isEliminated ? "text-white/40" : "text-white"}`}>
+                            {player.name}
+                            {player.isEliminated && (
+                              <span className="ml-2 text-[9px] font-black tracking-[0.2em] text-rose-400/80">
+                                OUT
+                              </span>
+                            )}
+                          </div>
                           <div className="text-[10px] text-white/40 sm:hidden mt-0.5 stat-number">
                             avg {player.avgPointsPerRound.toFixed(1)}
                           </div>
@@ -207,9 +216,15 @@ export default function Analytics() {
                             : "—"}
                         </td>
                         <td className="px-3 sm:px-6 py-4 text-right">
-                          <span className="inline-block px-2 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold text-xs sm:text-sm stat-number">
-                            {player.winProbability.toFixed(1)}%
-                          </span>
+                          {player.isEliminated ? (
+                            <span className="inline-block px-2 sm:px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300/80 font-bold text-xs sm:text-sm stat-number">
+                              0.0%
+                            </span>
+                          ) : (
+                            <span className="inline-block px-2 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold text-xs sm:text-sm stat-number">
+                              {player.winProbability.toFixed(1)}%
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

@@ -50,6 +50,9 @@ function getInitial(name: string) {
 
 export function Leaderboard({ players }: LeaderboardProps) {
   const leader = players[0]?.totalPoints ?? 0;
+  const maxWins = players.reduce((m, p) => Math.max(m, p.wins), 0);
+  const orangeCapHolderId =
+    maxWins > 0 ? players.find((p) => p.wins === maxWins)?.id ?? null : null;
 
   return (
     <div className="w-full overflow-x-auto">
@@ -65,8 +68,8 @@ export function Leaderboard({ players }: LeaderboardProps) {
             <th className="px-6 py-5 text-right text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
               POINTS
             </th>
-            <th className="px-6 py-5 text-right text-[10px] font-bold tracking-[0.25em] text-blue-300/70 hidden sm:table-cell">
-              WINS
+            <th className="px-6 py-5 text-right text-[10px] font-bold tracking-[0.25em] text-orange-300/80 hidden sm:table-cell">
+              ORANGE CAP
             </th>
             <th className="px-6 py-5 text-right text-[10px] font-bold tracking-[0.25em] text-purple-300/70 hidden md:table-cell">
               AVG/MATCH
@@ -137,9 +140,17 @@ export function Leaderboard({ players }: LeaderboardProps) {
                   </div>
                 </td>
                 <td className="px-6 py-5 text-right hidden sm:table-cell">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-300 font-bold rounded-full text-xs stat-number">
-                    {player.wins}
-                  </span>
+                  {player.id === orangeCapHolderId ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-500/30 to-amber-500/30 border border-orange-400/50 text-orange-200 font-bold rounded-full text-xs stat-number shadow-[0_0_16px_rgba(251,146,60,0.3)]">
+                      <span className="text-orange-300">●</span>
+                      <span>{player.wins}</span>
+                      <span className="text-[9px] tracking-[0.2em] text-orange-200/80 font-black">CAP</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/10 text-white/60 font-bold rounded-full text-xs stat-number">
+                      {player.wins}
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 py-5 text-right hidden md:table-cell">
                   <span className="stat-number text-purple-300 font-bold">

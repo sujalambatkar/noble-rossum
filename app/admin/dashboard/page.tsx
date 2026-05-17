@@ -5,10 +5,27 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AdminRoundForm } from "@/components/AdminRoundForm";
 import { AdminPlayerManagement } from "@/components/AdminPlayerManagement";
+import { SeasonControl } from "@/components/SeasonControl";
 import type { LeaderboardPlayer } from "@/components/Leaderboard";
+
+interface SeasonState {
+  isFinished: boolean;
+  winnerId: string | null;
+  winnerName: string | null;
+  declaredAt: string | null;
+}
+
+const EMPTY_SEASON: SeasonState = {
+  isFinished: false,
+  winnerId: null,
+  winnerName: null,
+  declaredAt: null,
+};
 
 export default function AdminDashboard() {
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
+  const [standings, setStandings] = useState<LeaderboardPlayer[]>([]);
+  const [season, setSeason] = useState<SeasonState>(EMPTY_SEASON);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [roundCount, setRoundCount] = useState(0);
@@ -21,9 +38,11 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [playersRes, roundsRes] = await Promise.all([
+      const [playersRes, roundsRes, standingsRes, seasonRes] = await Promise.all([
         fetch("/api/players"),
         fetch("/api/rounds"),
+        fetch("/api/standings"),
+        fetch("/api/season"),
       ]);
 
       if (!playersRes.ok || !roundsRes.ok) throw new Error("Failed to fetch");
@@ -33,6 +52,13 @@ export default function AdminDashboard() {
 
       setPlayers(playersData);
       setRoundCount(roundsData.rounds?.length || 0);
+
+      if (standingsRes.ok) {
+        setStandings(await standingsRes.json());
+      }
+      if (seasonRes.ok) {
+        setSeason(await seasonRes.json());
+      }
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Failed to load admin data");
@@ -127,16 +153,39 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="relative max-w-7xl mx-auto px-6 py-12">
+      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {error && (
           <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 animate-slide-up">
             {error}
           </div>
         )}
 
+        <div className="mb-6 animate-slide-up">
+          <SeasonControl
+            players={standings.length > 0 ? standings : players}
+            winnerId={season.winnerId}
+            winnerName={season.winnerName}
+            declaredAt={season.declaredAt}
+            onChange={fetchData}
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="animate-slide-up">
-            {players.length > 0 ? (
+          <div className="animate-slide-up" style={{ animationDelay: "60ms" }}>
+            {season.isFinished ? (
+              <div className="glass rounded-3xl p-10 text-center ring-1 ring-amber-400/30">
+                <div className="text-[10px] font-bold tracking-[0.4em] text-amber-300/70 mb-3">
+                  · SEASON CLOSED ·
+                </div>
+                <h3 className="text-2xl font-black text-shimmer mb-3">
+                  Round entry is locked
+                </h3>
+                <p className="text-white/60 text-sm max-w-sm mx-auto">
+                  {season.winnerName ?? "The champion"} has been declared. Withdraw
+                  the champion above to reopen the season and add more rounds.
+                </p>
+              </div>
+            ) : players.length > 0 ? (
               <AdminRoundForm
                 players={players}
                 nextRoundNumber={roundCount + 1}
@@ -151,7 +200,7 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
+          <div className="animate-slide-up" style={{ animationDelay: "120ms" }}>
             <AdminPlayerManagement
               players={players}
               onAddPlayer={handleAddPlayer}

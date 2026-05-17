@@ -2,16 +2,24 @@ import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { PodiumCard } from "@/components/PodiumCard";
 import { fetchStandings, fetchRoundCount } from "@/lib/standings";
+import { fetchSeasonState, type SeasonState } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   let standings: Awaited<ReturnType<typeof fetchStandings>> = [];
   let roundCount = 0;
+  let season: SeasonState = {
+    isFinished: false,
+    winnerId: null,
+    winnerName: null,
+    declaredAt: null,
+  };
   try {
-    [standings, roundCount] = await Promise.all([
+    [standings, roundCount, season] = await Promise.all([
       fetchStandings(),
       fetchRoundCount(),
+      fetchSeasonState(),
     ]);
   } catch (error) {
     console.error("Home page data fetch failed:", error);
@@ -58,27 +66,53 @@ export default async function Home() {
       {/* ============== HERO ============== */}
       <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-12">
         <div className="text-center animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8">
-            <span className="live-dot" />
-            <span className="text-[10px] font-bold tracking-[0.3em] text-white/70">
-              LIVE · ROUND {roundCount} COMPLETE
-            </span>
-          </div>
+          {season.isFinished ? (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400/20 to-yellow-300/20 border border-amber-400/40 mb-8 shadow-[0_0_30px_rgba(250,204,21,0.25)]">
+              <span className="text-[10px] font-black tracking-[0.3em] text-amber-200">
+                SEASON COMPLETE · CHAMPION CROWNED
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8">
+              <span className="live-dot" />
+              <span className="text-[10px] font-bold tracking-[0.3em] text-white/70">
+                LIVE · ROUND {roundCount} COMPLETE
+              </span>
+            </div>
+          )}
 
-          <h2 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
-            <span className="block text-white/90">The Championship</span>
-            <span className="block text-shimmer">Standings</span>
-          </h2>
+          {season.isFinished && season.winnerName ? (
+            <>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
+                <span className="block text-white/70 text-2xl md:text-3xl font-bold mb-3 tracking-widest">
+                  CHAMPION
+                </span>
+                <span className="block text-shimmer">{season.winnerName}</span>
+              </h2>
+              <p className="text-lg text-white/60 max-w-2xl mx-auto">
+                The season has been declared closed.{" "}
+                <span className="font-bold text-gold-gradient">{season.winnerName}</span>{" "}
+                is the official champion across {roundCount} rounds.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
+                <span className="block text-white/90">The Championship</span>
+                <span className="block text-shimmer">Standings</span>
+              </h2>
 
-          {leader && (
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              <span className="font-bold text-gold-gradient">{leader.name}</span> is
-              leading the pack with{" "}
-              <span className="stat-number font-black text-amber-300">
-                {leader.totalPoints.toLocaleString()}
-              </span>{" "}
-              points across {roundCount} rounds.
-            </p>
+              {leader && (
+                <p className="text-lg text-white/60 max-w-2xl mx-auto">
+                  <span className="font-bold text-gold-gradient">{leader.name}</span> is
+                  leading the pack with{" "}
+                  <span className="stat-number font-black text-amber-300">
+                    {leader.totalPoints.toLocaleString()}
+                  </span>{" "}
+                  points across {roundCount} rounds.
+                </p>
+              )}
+            </>
           )}
         </div>
 

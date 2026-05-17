@@ -33,7 +33,17 @@ create index if not exists idx_results_player_id on results(player_id);
 create index if not exists idx_results_round_id on results(round_id);
 create index if not exists idx_rounds_round_number on rounds(round_number);
 
+-- Season state: tracks the declared champion. Single-row singleton (id = 1).
+create table if not exists season_state (
+  id int primary key default 1,
+  winner_player_id uuid references players(id) on delete set null,
+  declared_at timestamptz,
+  constraint season_singleton check (id = 1)
+);
+insert into season_state (id) values (1) on conflict do nothing;
+
 -- Disable RLS for now (we'll handle auth in app)
 alter table players disable row level security;
 alter table rounds disable row level security;
 alter table results disable row level security;
+alter table season_state disable row level security;
