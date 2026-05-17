@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { PodiumCard } from "@/components/PodiumCard";
+export const dynamic = 'force-dynamic'
 
 interface LeaderboardPlayer {
   id: string;
