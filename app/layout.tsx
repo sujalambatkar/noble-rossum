@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Noble Rossum — Cricket Championship",
+  title: "Big Leagues — Cricket Championship",
   description: "Track points and standings across the season",
 };
 

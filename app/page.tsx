@@ -38,13 +38,13 @@ export default async function Home() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center font-black text-amber-950 text-lg shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
-                NR
+                BL
               </div>
               <div className="absolute -inset-2 bg-yellow-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div>
               <h1 className="text-2xl font-black text-shimmer leading-none">
-                NOBLE ROSSUM
+                BIG LEAGUES
               </h1>
               <p className="text-[10px] text-white/40 tracking-[0.3em] mt-1 font-mono">
                 CRICKET CHAMPIONSHIP · SEASON 1
@@ -181,7 +181,7 @@ export default async function Home() {
             </span>
           </div>
           <div className="text-white/30 text-[10px] tracking-widest">
-            © {new Date().getFullYear()} · NOBLE ROSSUM CHAMPIONSHIP
+            © {new Date().getFullYear()} · BIG LEAGUES CHAMPIONSHIP
           </div>
         </div>
       </footer>
