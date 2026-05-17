@@ -7,6 +7,7 @@ import { WinProbabilityChart } from "@/components/WinProbabilityChart";
 import { PerformanceTrendChart } from "@/components/PerformanceTrendChart";
 import { calculateAnalytics, AnalyticsData } from "@/lib/analytics";
 import type { LeaderboardPlayer } from "@/components/Leaderboard";
+export const dynamic = 'force-dynamic'
 
 export default function Analytics() {
   const [standings, setStandings] = useState<LeaderboardPlayer[]>([]);
