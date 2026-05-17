@@ -80,7 +80,7 @@ export default function Analytics() {
         </div>
       </header>
 
-      <main className="relative max-w-7xl mx-auto px-6 py-12">
+      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {standings.length === 0 ? (
           <div className="glass rounded-3xl p-20 text-center">
             <p className="text-white/60 text-lg mb-6">No data yet to analyze.</p>
@@ -91,7 +91,7 @@ export default function Analytics() {
         ) : (
           <>
             {/* Hero stat cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 animate-fade-in">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12 animate-fade-in">
               <HeroStat
                 label="LEADER"
                 value={leader?.name ?? "—"}
@@ -119,18 +119,18 @@ export default function Analytics() {
             </div>
 
             {/* Charts grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <div className="glass rounded-3xl p-6 animate-slide-up">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+              <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 animate-slide-up">
                 <PointsGapChart data={analytics} />
               </div>
-              <div className="glass rounded-3xl p-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
+              <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
                 <WinProbabilityChart data={analytics} />
               </div>
             </div>
 
             {/* Trend */}
             {rounds.length > 0 && (
-              <div className="glass rounded-3xl p-6 mb-8 animate-slide-up" style={{ animationDelay: "200ms" }}>
+              <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: "200ms" }}>
                 <PerformanceTrendChart
                   rounds={rounds}
                   results={results}
@@ -140,33 +140,33 @@ export default function Analytics() {
             )}
 
             {/* Detailed analytics table */}
-            <div className="glass rounded-3xl overflow-hidden animate-slide-up" style={{ animationDelay: "300ms" }}>
-              <div className="p-6 border-b border-white/5">
+            <div className="glass rounded-2xl sm:rounded-3xl overflow-hidden animate-slide-up" style={{ animationDelay: "300ms" }}>
+              <div className="p-4 sm:p-6 border-b border-white/5">
                 <div className="text-[10px] font-bold tracking-[0.4em] text-white/40 mb-2">
                   · DEEP DIVE ·
                 </div>
-                <h2 className="text-2xl font-black text-white">Detailed Analytics</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-white">Detailed Analytics</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5">
-                      <th className="px-6 py-4 text-left text-[10px] font-bold tracking-[0.25em] text-white/40">
+                      <th className="px-3 sm:px-6 py-4 text-left text-[10px] font-bold tracking-[0.25em] text-white/40">
                         PLAYER
                       </th>
-                      <th className="px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
-                        TOTAL PTS
+                      <th className="px-3 sm:px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
+                        PTS
                       </th>
-                      <th className="px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-purple-300/70">
+                      <th className="px-3 sm:px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-purple-300/70 hidden sm:table-cell">
                         AVG/MATCH
                       </th>
-                      <th className="px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-rose-300/70">
-                        GAP TO #1
+                      <th className="px-3 sm:px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-rose-300/70">
+                        GAP
                       </th>
-                      <th className="px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-cyan-300/70 hidden md:table-cell">
+                      <th className="px-3 sm:px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-cyan-300/70 hidden md:table-cell">
                         ROUNDS NEEDED
                       </th>
-                      <th className="px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-emerald-300/70">
+                      <th className="px-3 sm:px-6 py-4 text-right text-[10px] font-bold tracking-[0.25em] text-emerald-300/70">
                         WIN %
                       </th>
                     </tr>
@@ -178,33 +178,36 @@ export default function Analytics() {
                         className="leaderboard-row border-b border-white/5 last:border-b-0"
                         style={{ animationDelay: `${idx * 40}ms` }}
                       >
-                        <td className="px-6 py-4">
-                          <div className="font-bold text-white">{player.name}</div>
+                        <td className="px-3 sm:px-6 py-4">
+                          <div className="font-bold text-white text-sm sm:text-base truncate">{player.name}</div>
+                          <div className="text-[10px] text-white/40 sm:hidden mt-0.5 stat-number">
+                            avg {player.avgPointsPerRound.toFixed(1)}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 text-right stat-number text-amber-300 font-black text-lg">
+                        <td className="px-3 sm:px-6 py-4 text-right stat-number text-amber-300 font-black text-base sm:text-lg">
                           {player.totalPoints}
                         </td>
-                        <td className="px-6 py-4 text-right stat-number text-white/70 font-bold">
+                        <td className="px-3 sm:px-6 py-4 text-right stat-number text-white/70 font-bold hidden sm:table-cell">
                           {player.avgPointsPerRound.toFixed(1)}
                         </td>
-                        <td className="px-6 py-4 text-right stat-number">
+                        <td className="px-3 sm:px-6 py-4 text-right stat-number">
                           {player.pointsToFirst === 0 ? (
                             <span className="text-[10px] font-black tracking-widest text-amber-400">
                               LEADER
                             </span>
                           ) : (
-                            <span className="text-rose-300 font-semibold">
+                            <span className="text-rose-300 font-semibold text-sm sm:text-base">
                               −{player.pointsToFirst}
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right stat-number text-white/60 hidden md:table-cell">
+                        <td className="px-3 sm:px-6 py-4 text-right stat-number text-white/60 hidden md:table-cell">
                           {player.roundsNeededToFirst !== null
                             ? player.roundsNeededToFirst
                             : "—"}
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold text-sm stat-number">
+                        <td className="px-3 sm:px-6 py-4 text-right">
+                          <span className="inline-block px-2 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold text-xs sm:text-sm stat-number">
                             {player.winProbability.toFixed(1)}%
                           </span>
                         </td>
@@ -239,14 +242,14 @@ function HeroStat({
     blue: "text-blue-300",
   };
   return (
-    <div className="glass card-lift rounded-2xl p-5">
-      <div className="text-[10px] font-bold tracking-[0.3em] text-white/40 mb-2">
+    <div className="glass card-lift rounded-2xl p-4 sm:p-5">
+      <div className="text-[9px] sm:text-[10px] font-bold tracking-[0.25em] sm:tracking-[0.3em] text-white/40 mb-1 sm:mb-2">
         {label}
       </div>
-      <div className={`text-2xl md:text-3xl font-black ${colors[accent]} truncate`}>
+      <div className={`text-xl sm:text-2xl md:text-3xl font-black ${colors[accent]} truncate`}>
         {value}
       </div>
-      <div className="text-[10px] font-bold tracking-[0.25em] text-white/30 mt-1">
+      <div className="text-[9px] sm:text-[10px] font-bold tracking-[0.25em] text-white/30 mt-1 truncate">
         {sub}
       </div>
     </div>

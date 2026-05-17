@@ -10,12 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-interface RoundData {
-  roundNumber: number;
-  playerId: string;
-  points: number;
-}
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 interface PerformanceTrendChartProps {
   rounds: any[];
@@ -41,6 +36,8 @@ export function PerformanceTrendChart({
   results,
   players,
 }: PerformanceTrendChartProps) {
+  const isMobile = useIsMobile();
+
   // Build cumulative points chart for a proper championship trajectory view
   const sortedRounds = [...rounds].sort((a, b) => a.round_number - b.round_number);
   const totals: Record<string, number> = {};
@@ -60,32 +57,45 @@ export function PerformanceTrendChart({
 
   return (
     <div className="w-full">
-      <div className="mb-5 flex items-end justify-between">
-        <div>
+      <div className="mb-4 sm:mb-5 flex items-end justify-between gap-2">
+        <div className="min-w-0">
           <div className="text-[10px] font-bold tracking-[0.4em] text-emerald-300/70 mb-2">· TRAJECTORY ·</div>
-          <h3 className="text-xl font-black text-white">Cumulative Points Over Season</h3>
+          <h3 className="text-lg sm:text-xl font-black text-white truncate">
+            Cumulative Points Over Season
+          </h3>
         </div>
-        <div className="text-[10px] tracking-widest text-white/30">
+        <div className="text-[10px] tracking-widest text-white/30 shrink-0">
           {sortedRounds.length} ROUNDS
         </div>
       </div>
-      <div className="w-full h-96">
+      <div className="w-full h-72 sm:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 5 }}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 10, right: isMobile ? 8 : 20, left: -16, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis
               dataKey="roundNumber"
-              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }}
+              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: isMobile ? 10 : 11 }}
               axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              interval="preserveStartEnd"
+              minTickGap={isMobile ? 24 : 16}
             />
             <YAxis
-              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }}
+              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: isMobile ? 10 : 11 }}
               axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              width={32}
             />
             <Tooltip />
             <Legend
-              wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+              wrapperStyle={{
+                fontSize: isMobile ? 10 : 12,
+                paddingTop: 8,
+                lineHeight: "1.6",
+              }}
               iconType="circle"
+              iconSize={isMobile ? 8 : 10}
             />
             {players.map((player: any, index: number) => (
               <Line
@@ -96,8 +106,8 @@ export function PerformanceTrendChart({
                 dot={false}
                 isAnimationActive
                 animationDuration={1800}
-                strokeWidth={2.5}
-                activeDot={{ r: 5, strokeWidth: 0 }}
+                strokeWidth={isMobile ? 2 : 2.5}
+                activeDot={{ r: isMobile ? 4 : 5, strokeWidth: 0 }}
               />
             ))}
           </LineChart>
