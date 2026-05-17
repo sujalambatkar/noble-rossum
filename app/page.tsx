@@ -1,51 +1,21 @@
 import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { PodiumCard } from "@/components/PodiumCard";
-export const dynamic = 'force-dynamic'
+import { fetchStandings, fetchRoundCount } from "@/lib/standings";
 
-interface LeaderboardPlayer {
-  id: string;
-  name: string;
-  totalPoints: number;
-  wins: number;
-  roundsParticipated: number;
-  avgPointsPerRound: number;
-}
-
-function getBaseUrl() {
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
-}
-
-async function getStandings(): Promise<LeaderboardPlayer[]> {
-  try {
-    const response = await fetch(`${getBaseUrl()}/api/standings`, {
-      cache: "no-store",
-    });
-    if (!response.ok) throw new Error("Failed to fetch standings");
-    return response.json();
-  } catch (error) {
-    console.error("Error fetching standings:", error);
-    return [];
-  }
-}
-
-async function getRoundCount(): Promise<number> {
-  try {
-    const response = await fetch(`${getBaseUrl()}/api/rounds`, {
-      cache: "no-store",
-    });
-    if (!response.ok) return 0;
-    const data = await response.json();
-    return data.rounds?.length ?? 0;
-  } catch {
-    return 0;
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [standings, roundCount] = await Promise.all([getStandings(), getRoundCount()]);
+  let standings: Awaited<ReturnType<typeof fetchStandings>> = [];
+  let roundCount = 0;
+  try {
+    [standings, roundCount] = await Promise.all([
+      fetchStandings(),
+      fetchRoundCount(),
+    ]);
+  } catch (error) {
+    console.error("Home page data fetch failed:", error);
+  }
   const leader = standings[0];
   const totalPointsAwarded = standings.reduce((sum, p) => sum + p.totalPoints, 0);
   const totalWins = standings.reduce((sum, p) => sum + p.wins, 0);
