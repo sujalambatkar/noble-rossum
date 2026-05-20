@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { F1_POINTS } from "@/lib/points";
 import { isAdminAuthenticated } from "@/lib/auth";
 
@@ -93,10 +94,10 @@ export async function POST(request: NextRequest) {
         if (existingRound) {
           roundId = existingRound.id;
           // Delete existing results for this round
-          await supabase.from("results").delete().eq("round_id", roundId);
+          await supabaseAdmin.from("results").delete().eq("round_id", roundId);
         } else {
           // Create new round
-          const { data: newRound, error: roundError } = await supabase
+          const { data: newRound, error: roundError } = await supabaseAdmin
             .from("rounds")
             .insert([{ round_number: roundNumber }])
             .select()
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
           }));
 
         if (resultsToInsert.length > 0) {
-          const { error: resultsError } = await supabase
+          const { error: resultsError } = await supabaseAdmin
             .from("results")
             .insert(resultsToInsert);
 

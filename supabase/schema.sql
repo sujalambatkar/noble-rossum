@@ -42,8 +42,23 @@ create table if not exists season_state (
 );
 insert into season_state (id) values (1) on conflict do nothing;
 
--- Disable RLS for now (we'll handle auth in app)
-alter table players disable row level security;
-alter table rounds disable row level security;
-alter table results disable row level security;
-alter table season_state disable row level security;
+-- Row Level Security: anon (public) can READ everything but cannot write.
+-- All writes go through the server using the service_role key, which bypasses RLS.
+alter table players enable row level security;
+alter table rounds enable row level security;
+alter table results enable row level security;
+alter table season_state enable row level security;
+
+-- Drop existing policies (idempotent re-runs)
+drop policy if exists "public read players" on players;
+drop policy if exists "public read rounds" on rounds;
+drop policy if exists "public read results" on results;
+drop policy if exists "public read season_state" on season_state;
+
+create policy "public read players" on players for select using (true);
+create policy "public read rounds" on rounds for select using (true);
+create policy "public read results" on results for select using (true);
+create policy "public read season_state" on season_state for select using (true);
+
+-- NOTE: no insert/update/delete policies for anon → all writes blocked at DB level.
+-- The service_role key (used only on the server) bypasses RLS automatically.

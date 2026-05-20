@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { supabaseAdmin } from "./supabase-admin";
 
 export interface SeasonState {
   isFinished: boolean;
@@ -38,7 +39,7 @@ export async function fetchSeasonState(): Promise<SeasonState> {
 }
 
 export async function declareWinner(playerId: string): Promise<void> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("season_state")
     .upsert(
       {
@@ -52,7 +53,7 @@ export async function declareWinner(playerId: string): Promise<void> {
 }
 
 export async function withdrawWinner(): Promise<void> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("season_state")
     .upsert(
       { id: 1, winner_player_id: null, declared_at: null },
