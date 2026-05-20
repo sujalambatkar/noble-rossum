@@ -67,6 +67,14 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUnauthorized = (response: Response) => {
+    if (response.status === 401) {
+      router.push("/admin");
+      return true;
+    }
+    return false;
+  };
+
   const handleAddRound = async (roundNumber: number, resultData: any[]) => {
     try {
       const response = await fetch("/api/rounds", {
@@ -75,6 +83,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ roundNumber, results: resultData }),
       });
 
+      if (handleUnauthorized(response)) return;
       if (!response.ok) throw new Error("Failed to add round");
 
       setRoundCount((prev) => prev + 1);
@@ -93,6 +102,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ name }),
       });
 
+      if (handleUnauthorized(response)) return;
       if (!response.ok) throw new Error("Failed to add player");
 
       await fetchData();
@@ -108,6 +118,7 @@ export default function AdminDashboard() {
         method: "DELETE",
       });
 
+      if (handleUnauthorized(response)) return;
       if (!response.ok) throw new Error("Failed to remove player");
 
       await fetchData();
@@ -147,9 +158,21 @@ export default function AdminDashboard() {
               </p>
             </div>
           </Link>
-          <Link href="/" className="btn-ghost text-sm">
-            ← <span className="hidden sm:inline">Leaderboard</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="btn-ghost text-sm">
+              ← <span className="hidden sm:inline">Leaderboard</span>
+            </Link>
+            <button
+              type="button"
+              onClick={async () => {
+                await fetch("/api/admin/logout", { method: "POST" });
+                router.push("/admin");
+              }}
+              className="px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-200 transition-all"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

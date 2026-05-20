@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
-    "import": "tsx --env-file=.env.local scripts/import-real-data.ts"
+    "import": "tsx --env-file=.env.local scripts/import-csv.ts",
+    "import:legacy": "tsx --env-file=.env.local scripts/import-real-data.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

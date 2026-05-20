@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { F1_POINTS } from "@/lib/points";
+import { isAdminAuthenticated } from "@/lib/auth";
 
 interface CSVRow {
   roundNumber: number;
@@ -32,6 +33,9 @@ function parseCSVData(csvText: string): CSVRow[] {
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;

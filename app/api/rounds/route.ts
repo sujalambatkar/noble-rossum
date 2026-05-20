@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getPointsForRank } from "@/lib/points";
+import { isAdminAuthenticated } from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -28,6 +29,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { roundNumber, results: resultData } = await request.json();
 
